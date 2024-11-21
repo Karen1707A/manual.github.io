@@ -7,7 +7,7 @@ h1{
 }
 div{
     width: 300px;
-    border: 15px solid gray;
+    /*border: 15px solid gray;*/
     padding: 50px;
     margin: 20px;   
 }
