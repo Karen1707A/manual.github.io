@@ -19,8 +19,8 @@ img{
     margin-right: auto;
     width: 40%;
 }
-.footer{
-    background: color #f1f1f1bd;
+.footer {
+    background: color: gray;
     padding: 10px;
     text-align: center;
 }
