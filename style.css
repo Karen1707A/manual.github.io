@@ -19,8 +19,12 @@ img{
     margin-right: auto;
     width: 40%;
 }
+.header{
+    text-align: center;
+}
 .footer {
-    background-color: #92d889a4;
+    background-color:gainsboro;
     padding: 5px;
     text-align: center;
+    border: none;
 }
