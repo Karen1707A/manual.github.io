@@ -26,9 +26,8 @@ img{
     background-color:gainsboro;
     padding: 5px;
     text-align: center;
-    border: none;
 }
 p.one{
     border-style: solid;
-    border-color: rgb(72, 148, 42);
+    border-color:#004C00;
 }
