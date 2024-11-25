@@ -27,7 +27,6 @@ img{
     padding: 5px;
     text-align: center;
 }
-p.one{
-    border-style: solid;
-    border-color:#004C00;
+table, th, td {
+    border: 1px solid black
 }
