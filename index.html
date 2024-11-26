@@ -1,89 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
-    <link rel="stylesheet" href="style.css" />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ayuda </title>
-    <link rel="icono" type="help" href="help-file_40451.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario - Geoportal</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #13322B;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #D4C19C;
+        }
+
+        /* Encabezado y navegación */
+        header {
+            background-color: #285C4D;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        nav ul li a {
+            color: #D4C19C;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: #9D2449;
+        }
+
+        /* Contenido principal */
+        main {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(78, 35, 46, 0.1);
+        }
+
+        h1, h2 {
+            color: #285C4D;
+            text-align: center;
+        }
+
+        h1 {
+            border-bottom: 2px solid #9D2449;
+            padding-bottom: 10px;
+        }
+
+        /* Secciones */
+        section {
+            margin-bottom: 2rem;
+        }
+
+        /* Imágenes y capturas de pantalla */
+        .imagen-ejemplo {
+            display: block;
+            max-width: 80%;
+            height: auto;
+            margin: 1rem auto;
+            border: 1px solid #B38E5D;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(78, 35, 46, 0.1);
+        }
+
+        .imagen-grande {
+            max-width: 90%;
+        }
+
+        /* Botones y elementos interactivos */
+        .btn {
+            display: block;
+            width: 200px;
+            background-color: #285C4D;
+            color: #D4C19C;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            text-align: center;
+            margin: 1rem auto;
+        }
+
+        .btn:hover {
+            background-color: #13322B;
+        }
+
+        /* Pie de página */
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #285C4D;
+            color: #D4C19C;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+            }
+
+            nav ul li {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <div class="header">
-        <h1>Manual de uso</h1>
-    </div>
-    <div>
-        <p class="one">1. Se ingresa al Geoportal <a>"GeoVida"</a>
-            <img src="Geovida.JPG" alt="Portal" style="width:auto;" />
-        <br>
-            <a>2. Se selecciona el tipo de indice que se desea vizsualizar en el mapa</a>
-            <img src="Indices.jpg" alt="Indices" style="width:auto;" />
-            <br>
-            <a>3. Se selecciona la zona de interés de acuerdo a lo que se visualiza a continuación</a>
-            <img src="Zonas.jpg" alt="Zonas" style="width:350px;" />
-    <br>
-            <a>4. Para la selección de zona se visualiza el recuadro de Simbología de Zonas</a>
-            <img src="Simbologia.jpg" alt="Simbología de Zonas" style="width:auto;" />
-            <br>
-            <a>5. Se selecciona un año de los que se muestran en la lista</a>
-            <img src="Año.jpg" alt="Año" style="width:auto;" />
-            <br>
-            <a>6. Despues de que se selecciona el año debe aparecer una pantalla como la siguiente</a>
-            <img src="Grafica.jpg" alt="Grafica" style="width:auto;" />
-            <br>
-            <a>7. En la esquina superior de la grafica aparecerá un icono donde la grafica se mostrará en otra
-                pestaña</i></a>
-            <img src="GraficaSep.jpg" alt="Grafica en otra pestaña" style="width:auto;" />
-            <br>
-            <a>8. En la esquina superior derecha aparecen los 3 formatos de descarga</a>
-            <img src="Descarga.jpg" alt="Descarga" style="width:auto;" />
-            <br>
-            <a>9. Para visualizar la zona seleccionada se puede hacer zoom y identificar las áreas del cultivo</a>
-            <img src="Cultivos.jpg" alt="Cultivo de zona elegida" style="width:auto;" />
-            <br>
-            <a>10. Para cambiar el tipo de indice es necesario seleccionar Layers y se desplegara una lista de los
-                distintos indices de la zona seleccionada</a>
-            <img src="Layers.JPG" alt="Layers" style="width: auto;">
-            <br>
-            <a>11. Indice de vegetación</a>
-            <!-- <img src="IndiceVeg.jpg" alt="Indices de vegetacion" style="width:auto;" /> -->
-        <table style="width:40%;" >
-            <tr>
-                <th>Índice</th>
-                <th>Descripción</th>
-                <th  rowspan="5"><img src="IndiceVeg.jpg" alt="Valor de indices" style="width: auto;"></th>
-            </tr>
-            <tr>
-                <td>0</td>
-                <td>Vegetación muerta ó inanimada</td>
-            </tr>
-            <tr>
-                <td>0 a 0.5</td>
-                <td>Vegetación estresada</td>
-            </tr>
-            <tr>
-                <td>0.5 a 1</td>
-                <td>Vegetación medianamente sana</td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>Vegetación sana</td>
-            </tr>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#introduccion">Introducción</a></li>
+                <li><a href="#interfaz">Interfaz</a></li>
+                <li><a href="#acceso">información</a></li>
+            </ul>
+        </nav>
+    </header>
 
-        </table>
-        <br>
-        <a>12. Para realizar una nueva consulta </a>
-        <img src="NvConsul.JPG" alt="Nueva consulta" style="width:auto;" />
-        <br>
-        <a>13.Dentro de la pagina tambien podemos encontrar un link que dirige a la pagina del <a
-                href="https://aem.gob.mx/credes/EdoMex.html">CREDES Atlacomulco.</a>
-            <img src="Credes.jpg" alt="CREDES" style="width:auto;" />
-            </p>
-    </div>
+    <main>
+        <section id="introduccion">
+            <h1>Manual de Usuario del Geoportal</h1>
+            <p>Este manual está diseñado para guiarte paso a paso en el uso de la plataforma. Sigue estas instrucciones para aprovechar al máximo todas sus funciones..</p>
+        </section>
+
+        <section id="interfaz">
+            <h2>Interfaz de usuario y navegación básica</h2>
+            <p>La interfaz del geoportal es sencilla y fácil de manejar. A continuación, te explicamos los elementos principales:</p>
+            
+            <h3>1. Herramienta de trazado de polígonos</h3>
+            <p>Con esta herramienta puedes dibujar un polígono que marque tu área de interés en el mapa.</p>
+            <img src="../html/ayuda/1ayuda.jpg" alt="Herramienta de trazado de polígonos" class="imagen-ejemplo">
+
+            <h3>2. Selección del área de interés</h3>
+            <p>Después de habilitar la herramienta de trazado, elige la opción indicada en un recuadro rojo. Esto te permitirá comenzar a definir el área exacta que quieres analizar.</p>
+            <img src="../html/ayuda/2 recorte.PNG" alt="Selección del área de interés" class="imagen-ejemplo imagen-grande">
+
+            <h3>3. Ingreso de fechas</h3>
+            <p>Luego de seleccionar el área, ingresa la fecha de inicio y final del periodo que deseas analizar. Usa el formato "AAAA-MM-DD" para asegurarte de que el sistema lo reconozca correctamente.</p>
+            <img src="../html/ayuda/3_recorte.PNG" alt="Ingreso de fechas" class="imagen-ejemplo">
+            
+            <p>A continuación, te mostramos un ejemplo de cómo ingresar las fechas correctamente en el formato requerido (YYYY-MM-DD).</p>
+            <img src="../html/ayuda/4_recorte.PNG" alt="Ejemplo de ingreso de fechas" class="imagen-ejemplo">
+
+            <h3>4. Selección del tipo de índice</h3>
+            <p>El siguiente paso es elegir el tipo de índice que utilizarás en tu análisis. Puedes optar por índices normalizados o no normalizados, dependiendo la necesidad.</p>
+            <img src="../html/ayuda/5_recorte.png" alt="Selección del tipo de índice" class="imagen-ejemplo imagen-grande">
+
+            <h3>5. Procesamiento de datos</h3>
+            <p>Una vez que todo esté listo, haz clic en el botón "Procesar". El sistema comenzará a analizar el área y las fechas que seleccionaste y te mostrará los resultados.</p>
+            <img src="../html/ayuda/6_recorte.PNG" alt="Botón de procesamiento" class="imagen-ejemplo">
+        </section>
+
+        <section id="contacto">
+            <h2>Contacto para soporte</h2>
+            
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 . Todos los derechos reservados.</p>
+    </footer>
 </body>
-<div class="footer">
-    <p>Metodología utilizada: XP - Muestreo aleatorio - Enfoque académico.</p>
-</div>
-
 </html>
