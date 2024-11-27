@@ -16,7 +16,6 @@
             padding: 20px;
             background-color: #d4c19c;
         }
-
         /* Encabezado y navegación */
         header {
             background-color: #285c4d;
@@ -25,7 +24,6 @@
             top: 0;
             z-index: 1000;
         }
-
         nav ul {
             list-style-type: none;
             padding: 0;
@@ -41,11 +39,9 @@
             border-radius: 5px;
             transition: background-color 0.3s;
         }
-
         nav ul li a:hover {
             background-color: #9d2449;
         }
-
         /* Contenido principal */
         main {
             background-color: #fff;
@@ -53,23 +49,19 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(78, 35, 46, 0.1);
         }
-
         h1,
         h2 {
             color: #285c4d;
             text-align: center;
         }
-
         h1 {
             border-bottom: 2px solid #9d2449;
             padding-bottom: 10px;
         }
-
         /* Secciones */
         section {
             margin-bottom: 2rem;
         }
-
         /* Imágenes y capturas de pantalla */
         .imagen-ejemplo {
             display: block;
@@ -80,12 +72,7 @@
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(78, 35, 46, 0.1);
         }
-
-        .imagen-grande {
-            max-width: 90%;
-        }
-
-        /* Botones y elementos interactivos */
+        /* Botones y elementos interactivos 
         .btn {
             display: block;
             width: 200px;
@@ -97,7 +84,7 @@
             transition: background-color 0.3s;
             text-align: center;
             margin: 1rem auto;
-        }
+        } */
 
         .btn:hover {
             background-color: #13322b;
@@ -124,43 +111,33 @@
         }
     </style>
 </head>
-
 <body>
     <header>
         <nav>
             <ul>
-                <li>
-                    <a href="https://aem.gob.mx/credes/EdoMex.html">CREDES Atlacomulco</a>
-                </li>
-                <li>
-                    <a href="https://ee-esg2031126006.projects.earthengine.app/view/geovida"></a>Regresar
-                </li>
+                <li><a href="https://ee-esg2031126006.projects.earthengine.app/view/geovida"></a>Regresar al Geoportal</li>
+                <li><a href="https://aem.gob.mx/credes/EdoMex.html">CREDES Atlacomulco</a></li>
             </ul>
         </nav>
     </header>
-
     <main>
-        <section id="introduccion">
+        <section>
             <h1>Manual de Usuario</h1>
             <p>
                 Este manual está diseñado para guiarte paso a paso en el uso del
-                geoportal. Sigue estas instrucciones para aprovechar al máximo todas
-                sus funciones.
+                geoportal.
             </p>
         </section>
-
-        <section id="interfaz">
+        <section>
             <h2>Interfaz de usuario</h2>
             <p>
                 La interfaz del geoportal es sencilla y facil de utilizar. A
                 continuación, te explicamos los elementos que se tienen:
             </p>
 
-            <h3>1. Vista prinical del geoportal</h3>
-            <p>
-                Se muestra una vista previa de la pagina y los elementos que se tienen
-                dentro de la misma.
-            </p>
+            <h3>1. Vista principal del geoportal</h3>
+            <p>Se muestra una vista previa de la pagina y 
+                los elementos que se tienen dentro de la misma.</p>
             <img src="Geovida.JPG" alt="Geovida" class="imagen-ejemplo" />
 
             <h3>2. Selección del índice</h3>
@@ -168,19 +145,25 @@
             <img src="Indices.jpg" alt="Indice" class="imagen-ejemplo" />
 
             <h3>3. Selección de la zona de interés</h3>
-            <p></p>
+            <p>Despues se selecciona una zona, como se muestra en la simbologia 
+                que se tiene de los estados y los cultivos que se mostraran.</p>
             <img src="Zonas.jpg" alt="" class="imagen-ejemplo" />
 
             <h3>4. Selección de un año</h3>
-            <p></p>
+            <p>Se selecciona un año dentro del periodo 2019-2023, 
+                como se muestra en la lista despegable</p>
             <img src="Año.jpg" alt="" class="imagen-ejemplo" />
 
             <h3>5. Resultados</h3>
-            <p></p>
+            <p>Despues de haber ingresado los datos, esperamos a que carguen los 
+                resultados y se muestra una pantalla similar a la imagen, puede varear de la
+                zona seleccionada y del año.</p>
             <img src="Grafica.jpg" alt="" class="imagen-ejemplo" />
 
             <h3>6. Nueva consulta</h3>
-            <p></p>
+            <p>Para realizar una nueva consulta solo damos clic en el boton que 
+                se muestra sobre la grafica.
+            </p>
             <img src="NvConsul.JPG" alt="" class="imagen-ejemplo" />
         </section>
     </main>
