@@ -1,0 +1,657 @@
+var Sinaloa = ee.FeatureCollection('projects/ee-esg2031126006/assets/12_UTM');
+var  Campeche = ee.FeatureCollection('projects/ee-esg2031126006/assets/16_UTM');
+var  NayaSina = ee.FeatureCollection('projects/ee-esg2031126006/assets/Zona13UTMV1');
+var  Campeche2 = ee.FeatureCollection('projects/ee-esg2031126006/assets/Zona15UTMV1');
+
+var BANDAS = ['B8', 'B4', 'B2', 'B3', 'B5'];
+var palette = ['f83a05', 'f87705', 'fcab63', 'fcf763', 'FCD163', '99B718', '74A901', '66A000', '529400',
+                '3E8601', '207401', '056201', '004C00'];
+
+// Paleta de colores para la interfaz
+var uiColors = {
+  dark: '#13322B',    // pantone 627
+  light: '#285C4D',   // pantone 626
+  accent: '#D4C19C'   // pantone 468 (beige claro)
+};
+
+// Función para obtener el último día del mes
+function getLastDayOfMonth(year, month) {
+  return new Date(year, month, 0).getDate();
+}
+
+// Función para filtrar imágenes y calcular un índice de vegetación
+function calcularIndice(coleccion, fechaInicio, fechaFin, nubosidadMax, bandas, formula) {
+  return ee.ImageCollection(coleccion)
+    .filterDate(fechaInicio, fechaFin)
+    .filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than', nubosidadMax)
+    .map(function(imagen) {
+      var indice = formula(imagen.select(bandas));
+      var fecha = ee.Date(imagen.get('system:time_start'));
+      return ee.Image(indice).rename('Indice').set('system:time_start', fecha);
+    });
+}
+
+// Definir las fórmulas de los índices de vegetación normalizados
+var formulasNormalizadas = {
+  'ARVI': function(image) {
+    var NIR = image.select('B8');
+    var R = image.select('B4');
+    var B = image.select('B2');
+    var Y = 0.106;
+    return NIR.subtract(R.subtract(B.multiply(Y))).divide(NIR.add(R.subtract(B.multiply(Y))));
+  },
+  
+  //verificar formula de indices en el return
+  'GNDVI': function(image) {
+    var NIR = image.select('B8');
+    var GREEN = image.select('B3');
+    return NIR.subtract(GREEN).divide(NIR.add(GREEN));
+  },
+  'NDVI': function(image) {
+    return image.normalizedDifference(['B8', 'B4']);
+  },
+  //verificar formula igual en el return
+  'NDWI': function(image) {
+    var NIR = image.select('B8');
+    var GREEN = image.select('B3');
+    //return NIR.subtract(GREEN).divide(NIR.add(GREEN));
+    return GREEN.subtract(NIR).divide(GREEN.add(NIR));
+  },
+};
+
+// Definir las fórmulas de los índices de vegetación no normalizados
+var formulasNoNormalizadas = {
+  'EVI': function(image) {
+    var NIR = image.select('B8');
+    var R = image.select('B4');
+    var B = image.select('B2');
+    var G = 2.5;
+    var C1 = 6;
+    var C2 = 7.5;
+    var L = 1;
+    return image.expression(
+      'G * (NIR - R) / (NIR + C1 * R - C2 * B + L)',
+      {
+        'NIR': NIR,
+        'R': R,
+        'B': B,
+        'G': G,
+        'C1': C1,
+        'C2': C2,
+        'L': L
+      }
+    );
+  },
+   'EVI2': function(image) {
+    var NIR = image.select('B8');
+    var RED = image.select('B4');
+    return NIR.subtract(RED).divide(NIR.add(RED.multiply(2.4)).add(1)).multiply(2.5);
+  },
+   'MSAVI2': function(image) {
+    var NIR = image.select('B8');
+    var RED = image.select('B4');
+    var numerator = NIR.multiply(2).add(1).subtract((NIR.multiply(2).add(1)).pow(2).subtract(NIR.subtract(RED).multiply(8)).sqrt());
+    var denominator = 2;
+    var result = numerator.divide(denominator);
+    return result;
+  },
+  'SAVI': function(image) {
+    var NIR = image.select('B8');
+    var R = image.select('B4');
+    var L = 0.5;
+    return image.expression(
+      '((NIR - R) * (1 + L)) / (NIR + R + L)',
+      {
+        'NIR': NIR,
+        'R': R,
+        'L': L
+      }
+    );
+  }
+};
+
+// Nuevas funciones para crear enlaces
+function createCredesLink() {
+  var credes_leyend = ui.Label('CREDES Atlacomulco', {
+    color: '#FFD700', // Color dorado
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+    margin: '5px 0',  // Reducir el margen superior e inferior
+    textAlign: 'center',
+    fontSize: '12px'
+  });
+  credes_leyend.setUrl('https://aem.gob.mx/credes/EdoMex.html');
+  return credes_leyend;
+}
+
+function createLink() {
+  var help_leyend = ui.Label('HELP', {
+    color: '#FFD700', // Color dorado
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+    margin: '5px 0',  // Reducir el margen superior e inferior
+    textAlign: 'center',
+    fontSize: '12px'
+  });
+  help_leyend.setUrl('https://karen1707a.github.io/manual.github.io/');
+  return help_leyend;
+}
+
+// Crear el panel principal con estilo mejorado
+function createMainPanel() {
+  var mainPanel = ui.Panel({
+    layout: ui.Panel.Layout.flow('vertical'),
+    style: {
+      width: '350px',
+      padding: '20px',
+      backgroundColor: uiColors.light,
+      border: '2px solid ' + uiColors.dark,
+      position: 'top-right'
+    }
+  });
+  
+  // Ajustar el título para que se centre
+  var title = ui.Label('GeoVida', {
+    fontWeight: 'bold',
+    fontSize: '24px',
+    margin: '10px 0',
+    color: uiColors.accent,
+    backgroundColor: uiColors.light,
+    textAlign: 'center',  // Centrar texto dentro del label
+    stretch: 'horizontal'  // Asegura que el label ocupe todo el ancho
+  });
+  mainPanel.add(title);
+  return mainPanel;
+}
+// Función para crear la leyenda de colores
+function createLegend() {
+  var legend = ui.Panel({
+    style: {
+      position: 'bottom-left',
+      padding: '8px 15px',
+      backgroundColor: uiColors.light,
+      border: '1px solid ' + uiColors.accent
+    }
+  });
+  var legendTitle = ui.Label('Índice de Vegetación', {
+    fontWeight: 'bold',
+    fontSize: '16px',
+    margin: '0 0 10px 0',
+    padding: '0',
+    color: uiColors.accent,
+    backgroundColor: uiColors.light
+  });
+  legend.add(legendTitle);
+  var paletteLegend = ui.Panel({
+    layout: ui.Panel.Layout.flow('horizontal'),
+    style: {
+      stretch: 'horizontal',
+      margin: '0px 0px 4px 0px',
+      padding: '0px'
+    }
+  });
+  for (var i = 0; i < palette.length; i++) {
+    var color = palette[i];
+    var label = ui.Label({
+      style: {
+        backgroundColor: '#' + color,
+        padding: '8px',
+        margin: '0 0 0 0'
+      }
+    });
+    paletteLegend.add(label);
+  }
+  legend.add(paletteLegend);
+  var valuePanel = ui.Panel({
+    layout: ui.Panel.Layout.flow('horizontal'),
+    style: {
+      margin: '0',
+      padding: '0',
+      backgroundColor: uiColors.light
+    }
+  });
+  valuePanel.add(ui.Label({
+    value: '0',
+    style: {
+      margin: '0',
+      padding: '0',
+      textAlign: 'left',
+      stretch: 'horizontal',
+      width: '33%',
+      color: uiColors.accent,
+      backgroundColor: uiColors.light
+    }
+  }));
+  valuePanel.add(ui.Label({
+    value: '0.5',
+    style: {
+      margin: '0',
+      padding: '0',
+      textAlign: 'center',
+      stretch: 'horizontal',
+      width: '33%',
+      color: uiColors.accent,
+      backgroundColor: uiColors.light
+    }
+  }));
+  valuePanel.add(ui.Label({
+    value: '1',
+    style: {
+      margin: '0',
+      padding: '0',
+      textAlign: 'right',
+      stretch: 'horizontal',
+      width: '33%',
+      color: uiColors.accent,
+      backgroundColor: uiColors.light
+    }
+  }));
+  legend.add(valuePanel);
+  return legend;
+}
+
+// Función para crear la tabla de simbología
+function createSymbologyTable() {
+  var symbologyTable = ui.Panel({
+    style: {
+      position: 'bottom-right',
+      padding: '8px 15px',
+      backgroundColor: uiColors.light,
+      border: '1px solid ' + uiColors.accent
+    }
+  });
+  
+  var tableTitle = ui.Label('Simbología de Zonas', {
+    fontWeight: 'bold',
+    fontSize: '16px',
+    margin: '0 0 10px 0',
+    padding: '0',
+    color: uiColors.accent,
+    backgroundColor: uiColors.light
+  });
+  symbologyTable.add(tableTitle);
+  
+  function makeRow(description) {
+    return ui.Label(description, {
+      margin: '0 0 4px 0',
+      color: uiColors.accent,
+      backgroundColor: uiColors.light
+    });
+  }
+    
+  symbologyTable.add(makeRow('12UTM = Sinaloa (Maíz)'));
+  symbologyTable.add(makeRow('16UTM = Campeche (Maíz)'));
+  symbologyTable.add(makeRow('13UTM = Sinaloa y Nayarit (Limon) '));
+  symbologyTable.add(makeRow('15UTM = Campeche (Frijol)'));
+  
+  return symbologyTable;
+}
+
+// Modificar la función createUI
+function createUI() {
+  // Limpiar la interfaz existente
+  ui.root.clear();
+  // Crear el panel del mapa
+  var mapPanel = ui.Map();
+  mapPanel.style().set('width', 'calc(100% - 350px)');
+  mapPanel.setOptions('SATELLITE');
+  var mainPanel = createMainPanel();
+  // Agregar el mapa y el panel principal a la interfaz
+  ui.root.widgets().reset([mapPanel, mainPanel]);
+  return {
+    mapPanel: mapPanel,
+    mainPanel: mainPanel
+  };
+}
+
+// Inicializar la interfaz
+var uiComponents = createUI();
+var mapPanel = uiComponents.mapPanel;
+var mainPanel = uiComponents.mainPanel;
+
+// Agregar la leyenda al mapa
+mapPanel.add(createLegend());
+
+// Agregar la tabla de simbología al mapa
+mapPanel.add(createSymbologyTable());
+
+// Crear un panel para las gráficas con barra de desplazamiento
+var panelGraficas = ui.Panel({
+  style: {
+    height: '400px',
+    width: '100%',
+    backgroundColor: uiColors.light,
+    padding: '10px',
+    margin: '10px 0',
+    position: 'bottom-right'
+  }
+});
+
+// Variable para controlar el estado de procesamiento
+var procesando = false;
+
+// Crear los menús de selección con el estilo original
+var selectStyle = {
+  width: '100%',
+  margin: '10px 0',
+};
+
+var seleccionIndices = ui.Select({
+  items: ['Seleccione indices','Índices Normalizados', 'Índices No Normalizados'],
+  value: 'Seleccione indices',
+  onChange: actualizarMapa,
+  style: selectStyle
+});
+
+var seleccionZona = ui.Select({
+  items: ['Seleccione la zona de interés', '12UTM', '16UTM', '13UTM', '15UTM'],
+  value: 'Seleccione la zona de interés',
+  onChange: actualizarMapa,
+  style: selectStyle
+});
+
+var seleccionAño = ui.Select({
+  items: ['Seleccionar año','2019', '2020', '2021', '2022', '2023'],
+  value: 'Seleccionar año',
+  onChange: actualizarMapa,
+  style: selectStyle
+});
+
+// Crear un botón para nueva consulta
+var botonNuevaConsulta = ui.Button({
+  label: 'Nueva consulta',
+  onClick: function() {
+    // Restablecer todo a cero
+    mapPanel.layers().reset();
+    mapPanel.setCenter(-102, 23, 5);
+    procesando = false;
+    
+    // Mostrar los controles de selección nuevamente
+    seleccionIndices.setValue('Seleccione indices');
+    seleccionZona.setValue('Seleccione la zona de interés');
+    seleccionAño.setValue('Seleccionar año');
+    seleccionIndices.style().set('shown', true);
+    seleccionZona.style().set('shown', true);
+    seleccionAño.style().set('shown', true);
+    
+    // Ocultar el botón de nueva consulta
+    botonNuevaConsulta.style().set('shown', false);
+    
+    // Limpiar el panel de gráficas
+    panelGraficas.clear();
+  },
+  style: {
+    margin: '10px 0',
+    shown: false,
+    width: '100%',
+   // backgroundColor: uiColors.accent,
+    color: uiColors.dark,
+    padding: '10px',
+    textAlign: 'center',
+    fontSize: '16px',
+    fontWeight: 'bold'
+  }
+});
+
+// Agregar elementos al panel principal en el orden deseado
+mainPanel.add(seleccionIndices);
+mainPanel.add(seleccionZona);
+mainPanel.add(seleccionAño);
+mainPanel.add(botonNuevaConsulta);  // Botón de nueva consulta antes de las gráficas
+mainPanel.add(panelGraficas);
+
+function actualizarMapa() {
+  if (procesando) {
+    print('Procesando... Por favor espere.');
+    return;
+  }
+
+  var seleccion = seleccionIndices.getValue();
+  var año = seleccionAño.getValue();
+  var zona = seleccionZona.getValue();
+  
+  // Verificar si se han seleccionado opciones válidas
+  if (seleccion === 'Seleccione indices' || año === 'Seleccionar año' || zona === 'Seleccione la zona de interés') {
+    return; // No hacer nada si no se han seleccionado opciones válidas
+  }
+  // Iniciar procesamiento
+  procesando = true;
+  
+  // Ocultar los controles de selección
+  seleccionIndices.style().set('shown', false);
+  seleccionZona.style().set('shown', false);
+  seleccionAño.style().set('shown', false);
+  
+  // Mostrar el botón de nueva consulta
+
+  //botonNuevaConsulta.style().set('shown', true);
+  botonNuevaConsulta.style().set('shown', true);
+  
+  // Limpiar las capas existentes
+  mapPanel.layers().reset();
+
+  // Obtener las fórmulas correspondientes a la selección
+  var formulas = seleccion === 'Índices Normalizados' ? formulasNormalizadas : formulasNoNormalizadas;
+
+  // Crear y agregar capas de índices para cada período del año seleccionado
+  var indicesColeccion = {};
+  
+  for (var indice in formulas) {
+    indicesColeccion[indice] = ee.ImageCollection([]);
+  }
+
+  var periodos = [
+    {inicio: '-01-01', fin: '-04-30'},
+    {inicio: '-05-01', fin: '-08-31'},
+    {inicio: '-09-01', fin: '-12-31'}
+  ];
+
+  // Función para procesar la zona seleccionada
+  function procesarZona(zonaGeometria) {
+    for (var i = 0; i < periodos.length; i++) {
+      var fechaInicio = año + periodos[i].inicio;
+      var fechaFin = año + periodos[i].fin;
+
+      for (var indice in formulas) {
+        var indicePeriodo = calcularIndice("COPERNICUS/S2_SR", fechaInicio, fechaFin,
+                                           i === 1 ? 15 : 15, // Menor nubosidad en el período de mayo a agosto
+                                           BANDAS,
+                                           formulas[indice]);
+        
+        //VERIFICAR LAYERS
+        var indiceMean = indicePeriodo.mean().clip(zonaGeometria);
+        mapPanel.addLayer(indiceMean, {min: -0.2, max: 0.8, palette: palette}, año + ' P' + (i+1) + ' ' + indice + ' ' + zona, false);
+        
+        indicesColeccion[indice] = indicesColeccion[indice].merge(indicePeriodo);
+      }
+    }
+
+    // Limpiar el panel de gráficas
+    panelGraficas.clear();
+
+    if (seleccion === 'Índices No Normalizados') {
+      // Crear gráfico para cada índice no normalizado
+      for (var indice in indicesColeccion) {
+        var chart = ui.Chart.image.series({
+          imageCollection: indicesColeccion[indice].map(function(image) { return image.clip(zonaGeometria); }),
+          region: zonaGeometria,
+          reducer: ee.Reducer.mean(),
+          scale: 10,
+        })
+        .setChartType('ScatterChart')
+        .setOptions({
+          title: indice + ' en la zona ' + zona + ' para el año ' + año,
+          hAxis: {
+            title: 'Fecha',
+            format: 'MM-yyyy',
+            gridlines: {count: 12}
+          },
+          vAxis: {
+            title: indice,
+            minValue: -0.2,
+            maxValue: 0.8
+          },
+          pointSize: 4,
+          series: {
+            0: {color: 'blue'}
+          },
+          backgroundColor: 'white',
+          titleTextStyle: { color: 'black' },
+          legendTextStyle: { color: 'black' },
+          hAxis: { titleTextStyle: { color: 'black' }, textStyle: { color: 'black' } },
+          vAxis: { titleTextStyle: { color: 'black' }, textStyle: { color: 'black' } }
+        });
+
+        // Agregar el gráfico al panel de gráficas
+        panelGraficas.add(chart);
+      }
+    } else if (seleccion === 'Índices Normalizados') {
+      // Crear gráfico combinado para los índices normalizados
+      var indicesCombinados = ee.ImageCollection([]);
+     
+      for (var indice in formulasNormalizadas) {
+        var serieIndice = indicesColeccion[indice]
+          .filterDate(año + '-01-01', año + '-12-31')
+          .select(['Indice'], [indice])
+          .map(function(image) {
+            return image.clip(zonaGeometria);
+          });
+       
+        indicesCombinados = indicesCombinados.merge(serieIndice);
+      }
+     
+      // Crear el gráfico combinado
+      var chartCombinado = ui.Chart.image.series({
+        imageCollection: indicesCombinados,
+        region: zonaGeometria,
+        reducer: ee.Reducer.mean(),
+        scale: 10,
+      })
+      .setChartType('ScatterChart')
+      .setOptions({
+        title: 'Índices de Vegetación Normalizados en la zona ' + zona + ' para el año ' + año,
+        hAxis: {
+          title: 'Fecha',
+          format: 'MM-yyyy',
+          gridlines: {count: 12},
+          viewWindow: {
+            min: new Date(año + '-01-01'),
+            max: new Date(año + '-12-31')
+          }
+        },
+        vAxis: {
+          title: 'Valor del Índice',
+          minValue: -0.2,
+          maxValue: 0.8
+        },
+        pointSize: 4,
+        series: {
+          0: {color: 'blue'},  // ARVI
+          1: {color: 'black'},  // GNDVI
+          2: {color: 'red'},  // NDVI
+          3: {color: 'green'}  // NDWI
+        },
+        legend: {position: 'bottom'},
+        backgroundColor: 'white',
+        titleTextStyle: { color: 'black' },
+        legendTextStyle: { color: 'black' },
+        hAxis: { titleTextStyle: { color: 'black' }, textStyle: { color: 'black' } },
+        vAxis: { titleTextStyle: { color: 'black' }, textStyle: { color: 'black' } }
+      });
+
+      // Agregar el gráfico combinado al panel de gráficas
+      panelGraficas.add(chartCombinado);
+    }
+    
+    // Finalizar procesamiento
+    procesando = false;
+  }
+
+  // Seleccionar la geometría de la zona
+  var zonaGeometria;
+  var zonaDescripcion;
+  switch(zona) {
+    case '12UTM':
+      zonaGeometria = Sinaloa;
+      zonaDescripcion = 'SINALOA';
+      break;
+    case '16UTM':
+      zonaGeometria = Campeche;
+      zonaDescripcion = 'CAMPECHE';
+      break;
+    case '13UTM':
+      zonaGeometria = NayaSina;
+      zonaDescripcion = 'SINALOA Y NAYARIT';
+      break;
+    case '15UTM':
+      zonaGeometria = Campeche2;
+      zonaDescripcion = 'CAMPECHE';
+      break;
+  }
+
+  // Procesar la zona seleccionada
+  procesarZona(zonaGeometria);
+  
+  // Agregar la capa de la zona al mapa
+  mapPanel.addLayer(zonaGeometria, {color: 'FF0000'}, zona + ' = ' + zonaDescripcion);
+  mapPanel.centerObject(zonaGeometria, 8);
+}
+
+// Añadir un botón para centrar el mapa en la zona seleccionada
+var botonCentrar = ui.Button({
+  label: 'Centrar en la zona seleccionada',
+  onClick: function() {
+    if (procesando) {
+      print('Procesando... Por favor espere.');
+      return;
+    }
+    var zona = seleccionZona.getValue();
+    var zonaGeometria;
+    switch(zona) {
+      case '12UTM':
+        zonaGeometria = Sinaloa;
+        break;
+      case '16UTM':
+        zonaGeometria = Campeche;
+        break;
+      case '13UTM':
+        zonaGeometria = NayaSina;
+        break;
+      case '15UTM':
+        zonaGeometria = Campeche2;
+        break;
+      default:
+        return; // No hacer nada si no se ha seleccionado una zona válida
+    }
+    mapPanel.centerObject(zonaGeometria, 8);
+  },
+  style: {
+    position: 'bottom-right'
+  }
+});
+
+// Añadir el botón de centrar al mapa
+mapPanel.add(botonCentrar);
+
+// Inicializar el mapa
+mapPanel.setOptions('HYBRID');
+mapPanel.setCenter(-102.5528, 23.6345, 6); // Centrar en México
+
+mapPanel.drawingTools().setShown(false);
+// Desactivar la funcionalidad de dibujo
+mapPanel.drawingTools().layers().forEach(function(layer) {
+  layer.setShown(false);
+});
+
+// Añadir texto al final del panel principal
+var metodologiaText = ui.Label('Metodología utilizada: XP\n  - Muestreo aleatorio\n -  Enfoque académico', {
+  fontSize: '10px',
+ // color: uiColors.accent,
+  margin: '10px 0 0 0',
+  padding: '5px',
+  textAlign: 'center'
+});
+
+  // Agregar los nuevos links
+  mainPanel.add(createCredesLink());
+  mainPanel.add(createLink());
+
+mainPanel.add(metodologiaText);
