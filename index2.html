@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manual de Usuario - GeoVida</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #13322b;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #d4c19c;
+        }
+
+        /* Encabezado y navegación */
+        header {
+            background-color: #285c4d;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        nav ul li a {
+            color: #d4c19c;
+            text-decoration:none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: #9d2449;
+        }
+
+        /* Contenido principal */
+        main {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(78, 35, 46, 0.1);
+        }
+
+        h1,
+        h2 {
+            color: #285c4d;
+            text-align: center;
+        }
+
+        h1 {
+            border-bottom: 2px solid #9d2449;
+            padding-bottom: 10px;
+        }
+
+        /* Secciones */
+        section {
+            margin-bottom: 2rem;
+        }
+
+        /* Imágenes y capturas de pantalla */
+        .imagen-ejemplo {
+            display: block;
+            max-width: 80%;
+            height: auto;
+            margin: 1rem auto;
+            border: 1px solid #b38e5d;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(78, 35, 46, 0.1);
+        }
+        
+        .btn:hover {
+            background-color: #13322b;
+        }
+
+        /* Pie de página */
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #285c4d;
+            color: #d4c19c;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+            }
+
+            nav ul li {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="https://ee-esg2031126006.projects.earthengine.app/view/geovida"></a>Regresar al Geoportal</li>
+                <li><a href="https://aem.gob.mx/credes/EdoMex.html">Información del CREDES</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h1>Manual de Usuario</h1>
+            <p>
+                Este manual está diseñado para guiarte paso a paso en el uso del
+                Geoportal.
+                De igual forma, se explicarán los elementos que se muestran en el Geoportal.
+            </p>
+        </section>
+        <section>
+            <h2>Interfaz de usuario</h2>
+            <p>
+                La interfaz del Geoportal es sencilla y fácil de utilizar. A
+                continuación, te explicamos los elementos que contiene:
+            </p>
+    
+            <h3>1. Vista principal del Geoportal</h3>
+            <p>Se muestra una vista previa de la página y 
+                los elementos que contiene y que servirán de apoyo para el uso del geoportal.</p>
+            <img src="Geovida.JPG" alt="Geovida" class="imagen-ejemplo" />
+    
+            <h3>2. Selección del índice</h3>
+            <p>Se debe elegir si el índice será normalizado o no normalizado.</p>
+            <img src="Indices.jpg" alt="Índice" class="imagen-ejemplo" />
+    
+            <h3>3. Selección de la zona de interés</h3>
+            <p>Después, se selecciona una zona, como se muestra en la simbología 
+                disponible de los Estados y los cultivos que se mostrarán.</p>
+            <img src="Zonas.jpg" alt="Zonas" class="imagen-ejemplo" />
+    
+            <h3>4. Selección de un año</h3>
+            <p>Se selecciona un año dentro del periodo 2019-2023, 
+                como se muestra en la lista desplegable.</p>
+            <img src="Año.jpg" alt="Año" class="imagen-ejemplo" />
+    
+            <h3>5. Resultados</h3>
+            <p>Después de haber ingresado los datos, esperamos a que carguen los 
+                resultados. Se muestra una pantalla similar a la imagen, que puede variar según la
+                zona seleccionada y el año.</p>
+            <img src="resultados.JPG" alt="Resultado" class="imagen-ejemplo" />
+    
+            <h3>6. Nueva consulta</h3>
+            <p>Para realizar una nueva consulta, solo damos clic en el botón que 
+                aparece sobre la gráfica.
+            </p>
+            <img src="NvConsul.JPG" alt="Nueva consulta" class="imagen-ejemplo" />
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 . Todos los derechos reservados.</p>
+    </footer>
+</body>
+
+</html>
